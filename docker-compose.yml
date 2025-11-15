@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: rum
+      POSTGRES_USER: rum
+      POSTGRES_PASSWORD: Rum1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scrum_user -d scrum_master"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
