@@ -23,12 +23,6 @@ An intelligent Scrum Master assistant built with FastAPI and powered by Anthropi
 
 ### Installation
 
-1. **Clone the repository:**
-```bash
-git clone <repository-url>
-cd ai-agent
-```
-
 2. **Create and activate virtual environment:**
 ```bash
 python -m venv venv
@@ -68,7 +62,7 @@ docker-compose up -d
 
 2. **Update `.env` file with PostgreSQL connection:**
 ```bash
-DATABASE_URL=postgresql://scrum_user:scrum_password@localhost:5432/scrum_master
+DATABASE_URL=postgresql://rum:Rum1234@localhost:2345/rum
 ```
 
 3. **Run the application locally:**
