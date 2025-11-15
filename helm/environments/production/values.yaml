@@ -1,0 +1,69 @@
+# Production environment values
+replicaCount: 3
+
+image:
+  repository: scrum-master-ai
+  tag: "v0.1.0"
+  pullPolicy: IfNotPresent
+
+app:
+  debug: false
+
+  anthropic:
+    modelName: "claude-sonnet-4-5-20250929"
+    maxTokens: 4096
+    temperature: 0.7
+
+  slack:
+    enabled: true
+
+  cors:
+    origins: "https://scrum-master-ai.example.com"
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+
+postgresql:
+  enabled: true
+  auth:
+    username: rum
+    database: rum
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  hosts:
+    - host: scrum-master-ai.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: scrum-master-ai-prod-tls
+      hosts:
+        - scrum-master-ai.example.com
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80

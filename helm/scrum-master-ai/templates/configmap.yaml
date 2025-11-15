@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "scrum-master-ai.fullname" . }}
+  labels:
+    {{- include "scrum-master-ai.labels" . | nindent 4 }}
+data:
+  debug: {{ .Values.app.debug | quote }}
+  host: {{ .Values.app.host | quote }}
+  port: {{ .Values.app.port | quote }}
+  model-name: {{ .Values.app.anthropic.modelName | quote }}
+  max-tokens: {{ .Values.app.anthropic.maxTokens | quote }}
+  temperature: {{ .Values.app.anthropic.temperature | quote }}
+  enable-daily-standup: {{ .Values.app.features.enableDailyStandup | quote }}
+  enable-sprint-planning: {{ .Values.app.features.enableSprintPlanning | quote }}
+  enable-retrospectives: {{ .Values.app.features.enableRetrospectives | quote }}
+  cors-origins: {{ .Values.app.cors.origins | quote }}
