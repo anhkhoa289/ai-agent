@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: rum
       POSTGRES_USER: rum
-      POSTGRES_PASSWORD: Rum@1234
+      POSTGRES_PASSWORD: Rum1234
     ports:
       - "5432:5432"
     volumes:
