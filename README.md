@@ -17,19 +17,29 @@ The system uses a clean, modular architecture:
 
 ```
 ┌─────────────────────────────────────────┐
-│           Slack Interface               │
-│   (Messages, Commands, Modals)          │
+│         User Interface Layer            │
+│    (Slack Bot / Web Dashboard)          │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│       Scrum Master AI Agent             │
-│      (Claude AI Integration)            │
+│      AI Agent Orchestrator              │
+│         (CrewAI Core)                   │
 └──────────────┬──────────────────────────┘
                │
-┌──────────────▼──────────────────────────┐
-│         Storage Layer                   │
-│    (Sprint Data, Team Metrics)          │
-└─────────────────────────────────────────┘
+     ┌─────────┼─────────┐
+     │         │         │
+┌────▼───┐ ┌──▼───┐ ┌──▼────┐
+│ Agent1 │ │Agent2│ │Agent3 │
+│Standup │ │Track │ │Report │
+│Master  │ │Master│ │Master │
+└────┬───┘ └──┬───┘ └──┬────┘
+     │        │        │
+     └────────┼────────┘
+              │
+┌─────────────▼──────────────────────────┐
+│      Integration Layer                 │
+│  (Jira/Trello API + Slack API)         │
+└────────────────────────────────────────┘
 ```
 
 **Key Components:**
