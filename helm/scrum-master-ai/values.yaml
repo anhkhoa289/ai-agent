@@ -1,0 +1,175 @@
+# Default values for scrum-master-ai
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: scrum-master-ai
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  annotations: {}
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: scrum-master-ai.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: scrum-master-ai-tls
+  #    hosts:
+  #      - scrum-master-ai.local
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Application configuration
+app:
+  name: "Scrum Master AI Agent"
+  version: "0.1.0"
+  debug: false
+  apiPrefix: "/api/v1"
+
+  # Server settings
+  host: "0.0.0.0"
+  port: 8000
+
+  # AI Configuration
+  anthropic:
+    # API key should be provided via secret
+    apiKeySecretName: "scrum-master-ai-secrets"
+    apiKeySecretKey: "anthropic-api-key"
+    modelName: "claude-sonnet-4-5-20250929"
+    maxTokens: 4096
+    temperature: 0.7
+
+  # Slack Configuration (Optional)
+  slack:
+    enabled: false
+    # Credentials should be provided via secret
+    secretName: "scrum-master-ai-slack-secrets"
+    botTokenKey: "bot-token"
+    appTokenKey: "app-token"
+    signingSecretKey: "signing-secret"
+
+  # Feature Flags
+  features:
+    enableDailyStandup: true
+    enableSprintPlanning: true
+    enableRetrospectives: true
+
+  # CORS Settings
+  cors:
+    origins: "*"
+    allowCredentials: true
+    allowMethods: "*"
+    allowHeaders: "*"
+
+# PostgreSQL configuration (using Bitnami chart)
+postgresql:
+  enabled: true
+  auth:
+    username: rum
+    password: Rum1234
+    database: rum
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+  # For custom database URL, disable this and provide external database
+  # enabled: false
+
+# External database configuration (if postgresql.enabled is false)
+externalDatabase:
+  host: ""
+  port: 5432
+  username: ""
+  password: ""
+  database: ""
+  # Or provide full connection string
+  url: ""
+
+# Health check configuration
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3

@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "scrum-master-ai.fullname" . }}
+  labels:
+    {{- include "scrum-master-ai.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "scrum-master-ai.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "scrum-master-ai.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "scrum-master-ai.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.app.port }}
+          protocol: TCP
+        env:
+        - name: DEBUG
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: debug
+        - name: HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: host
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: port
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: database-url
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.app.anthropic.apiKeySecretName }}
+              key: {{ .Values.app.anthropic.apiKeySecretKey }}
+        - name: MODEL_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: model-name
+        - name: MAX_TOKENS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: max-tokens
+        - name: TEMPERATURE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: temperature
+        - name: ENABLE_DAILY_STANDUP
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: enable-daily-standup
+        - name: ENABLE_SPRINT_PLANNING
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: enable-sprint-planning
+        - name: ENABLE_RETROSPECTIVES
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: enable-retrospectives
+        - name: CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "scrum-master-ai.fullname" . }}
+              key: cors-origins
+        {{- if .Values.app.slack.enabled }}
+        - name: SLACK_BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.app.slack.secretName }}
+              key: {{ .Values.app.slack.botTokenKey }}
+        - name: SLACK_APP_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.app.slack.secretName }}
+              key: {{ .Values.app.slack.appTokenKey }}
+        - name: SLACK_SIGNING_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.app.slack.secretName }}
+              key: {{ .Values.app.slack.signingSecretKey }}
+        {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe.httpGet | nindent 12 }}
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe.httpGet | nindent 12 }}
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

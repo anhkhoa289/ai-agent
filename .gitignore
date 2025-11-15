@@ -65,3 +65,11 @@ dmypy.json
 # Distribution
 *.tar.gz
 *.whl
+
+# Helm/Kubernetes
+# Note: We keep secrets.yaml in the repo as templates with instructions
+# but ensure they don't contain actual secret values
+helm/environments/*/secrets.enc.yaml
+*.dec.yaml
+kubeconfig
+.kube/
