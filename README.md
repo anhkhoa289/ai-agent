@@ -1,261 +1,283 @@
-# Scrum Master AI Agent
+# Scrum Master AI Agent - FastAPI
 
-An intelligent Scrum Master assistant that communicates through Slack to help agile teams manage sprints, facilitate standups, and improve team productivity.
+An intelligent Scrum Master assistant built with FastAPI and powered by Anthropic Claude AI. This RESTful API helps agile teams manage sprints, facilitate standups, conduct retrospectives, and improve team productivity.
 
 ## Features
 
-- **Slack Integration**: Natural conversation through Slack with slash commands and interactive modals
-- **Daily Standup Management**: Collect and summarize team updates with blocker identification
-- **Sprint Planning Assistance**: Help with story estimation, sprint goal setting, and backlog refinement
-- **Retrospective Facilitation**: Guide teams through retrospectives with AI-powered insights
-- **Team Velocity Tracking**: Monitor and analyze team performance over time
-- **Intelligent Responses**: Powered by Claude AI for context-aware assistance
+- **RESTful API**: Clean, modern FastAPI-based REST API
+- **AI-Powered Insights**: Leverage Claude AI for intelligent scrum assistance
+- **Sprint Management**: Create and track sprints with goals and velocity metrics
+- **Daily Standups**: Record and analyze standup updates with blocker detection
+- **Retrospectives**: Conduct retrospectives with AI-generated insights
+- **Story Estimation**: Get AI-assisted story point estimation guidance
+- **SQLite Database**: Simple, file-based persistence
+- **Docker Support**: Ready-to-deploy containerization
+- **Interactive Docs**: Auto-generated Swagger UI and ReDoc documentation
 
-## Architecture
-
-The system uses a clean, modular architecture:
-
-```
-┌─────────────────────────────────────────┐
-│         User Interface Layer            │
-│    (Slack Bot / Web Dashboard)          │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│      AI Agent Orchestrator              │
-│         (CrewAI Core)                   │
-└──────────────┬──────────────────────────┘
-               │
-     ┌─────────┼─────────┐
-     │         │         │
-┌────▼───┐ ┌──▼───┐ ┌──▼────┐
-│ Agent1 │ │Agent2│ │Agent3 │
-│Standup │ │Track │ │Report │
-│Master  │ │Master│ │Master │
-└────┬───┘ └──┬───┘ └──┬────┘
-     │        │        │
-     └────────┼────────┘
-              │
-┌─────────────▼──────────────────────────┐
-│      Integration Layer                 │
-│  (Jira/Trello API + Slack API)         │
-└────────────────────────────────────────┘
-```
-
-**Key Components:**
-- **Slack Bot** (src/slack/bot.py): Handles Slack events, commands, and interactions
-- **AI Agent** (src/agent/scrum_master.py): Core intelligence using Claude for responses
-- **Database** (src/storage/database.py): Stores sprint data, standups, and metrics
-- **Configuration** (src/config.py): Environment-based configuration management
-
-## Setup
+## Quick Start
 
 ### Prerequisites
 
-- Python 3.9+
-- Slack workspace with admin access
-- Anthropic API key for Claude
+- Python 3.11+
+- Anthropic API key ([Get one here](https://console.anthropic.com/))
 
-### Step 1: Slack App Configuration
+### Installation
 
-1. Go to [api.slack.com/apps](https://api.slack.com/apps) and create a new app
-2. Choose "From scratch" and name it (e.g., "Scrum Master")
-3. Under "OAuth & Permissions", add these Bot Token Scopes:
-   - `app_mentions:read`
-   - `chat:write`
-   - `commands`
-   - `im:history`
-   - `im:read`
-   - `im:write`
-   - `users:read`
-   - `channels:read`
-   - `groups:read`
-
-4. Under "Event Subscriptions", enable events and subscribe to:
-   - `app_mention`
-   - `message.im`
-
-5. Under "Interactivity & Shortcuts":
-   - Enable Interactivity
-   - Add a Request URL (you can use ngrok for local development)
-
-6. Under "Slash Commands", create these commands:
-   - `/standup` - "Submit daily standup update"
-   - `/sprint-planning` - "Get help with sprint planning"
-   - `/retrospective` - "Start a retrospective"
-   - `/estimate` - "Estimate story points"
-
-7. Enable "Socket Mode" under "Socket Mode" section (for local development)
-8. Install the app to your workspace
-
-### Step 2: Installation
-
-1. Clone the repository:
+1. **Clone the repository:**
 ```bash
 git clone <repository-url>
 cd ai-agent
 ```
 
-2. Create and activate virtual environment:
+2. **Create and activate virtual environment:**
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
+3. **Install dependencies:**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Configure environment variables:
+4. **Configure environment:**
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your credentials:
+Edit `.env` and add your Anthropic API key:
 ```bash
-# Get these from your Slack app settings
-SLACK_BOT_TOKEN=xoxb-your-bot-token
-SLACK_APP_TOKEN=xapp-your-app-token
-SLACK_SIGNING_SECRET=your-signing-secret
-
-# Get this from Anthropic Console (console.anthropic.com)
-ANTHROPIC_API_KEY=your-anthropic-api-key
+ANTHROPIC_API_KEY=your_api_key_here
 ```
 
-### Step 3: Run the Bot
-
+5. **Run the application:**
 ```bash
 python main.py
 ```
 
-You should see:
+The API will start at `http://localhost:8000`
+
+### Using Docker
+
+1. **Build and run with Docker Compose:**
+```bash
+docker-compose up -d
 ```
-INFO - Configuration loaded successfully
-INFO - Using model: claude-sonnet-4-5-20250929
-INFO - Scrum Master AI Agent is starting...
+
+2. **Or build manually:**
+```bash
+docker build -t scrum-master-api .
+docker run -p 8000:8000 --env-file .env scrum-master-api
 ```
 
-## Usage
+## API Documentation
 
-### Slack Commands
+Once running, access the interactive documentation:
 
-**Slash Commands:**
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **OpenAPI JSON**: http://localhost:8000/openapi.json
 
-- `/standup` - Opens a modal to submit your daily standup update
-  - What did you work on yesterday?
-  - What will you work on today?
-  - Any blockers or impediments?
-
-- `/sprint-planning [topic]` - Get help with sprint planning
-  - Example: `/sprint-planning capacity planning for 2-week sprint`
-
-- `/retrospective` - Start a retrospective session
-  - The bot will guide you through what went well, what didn't, and improvements
-
-- `/estimate <user story>` - Get AI-assisted story point estimation
-  - Example: `/estimate Add user authentication with OAuth`
-
-**Direct Messages:**
-
-You can also directly message the bot or mention it in channels:
-
-- `@ScrumMaster help me plan the next sprint`
-- `@ScrumMaster what's our team velocity?`
-- `@ScrumMaster analyze yesterday's standup updates`
-
-**Example Conversations:**
+## Project Structure
 
 ```
-You: @ScrumMaster How should we approach sprint planning for a new team?
+ai-agent/
+├── src/
+│   ├── api/
+│   │   └── routes/
+│   │       ├── health.py          # Health check endpoints
+│   │       ├── sprints.py         # Sprint CRUD operations
+│   │       ├── standups.py        # Standup management
+│   │       └── retrospectives.py  # Retrospective endpoints
+│   ├── agent/
+│   │   └── scrum_master.py        # AI agent logic
+│   ├── models/
+│   │   ├── base.py                # SQLAlchemy base
+│   │   ├── sprint.py              # Sprint model
+│   │   ├── standup.py             # Standup model
+│   │   └── retrospective.py       # Retrospective model
+│   ├── schemas/
+│   │   ├── sprint.py              # Sprint Pydantic schemas
+│   │   ├── standup.py             # Standup Pydantic schemas
+│   │   └── retrospective.py       # Retrospective Pydantic schemas
+│   ├── storage/
+│   │   └── database.py            # Database configuration
+│   ├── config.py                  # Application settings
+│   └── main.py                    # FastAPI app factory
+├── main.py                        # Application entry point
+├── requirements.txt               # Python dependencies
+├── Dockerfile                     # Docker configuration
+├── docker-compose.yml             # Docker Compose setup
+├── .env.example                   # Example environment variables
+└── README.md                      # This file
+```
 
-Bot: Great question! For a new team, I recommend:
+## API Endpoints
 
-*Sprint Planning Approach:*
-1. Start with a shorter sprint (1 week) to establish baseline velocity
-2. Focus on team capacity and working agreements first
-3. Keep initial commitments conservative
+### Health Check
+- `GET /health` - Health check with app info
+- `GET /` - Root endpoint with API information
 
-*Key Activities:*
-- Review and refine backlog items together
-- Ensure everyone understands the Definition of Done
-- Break down stories to similar sizes (3-5 points)
-- Leave buffer time for unknowns (~20%)
+### Sprints
+- `POST /api/v1/sprints` - Create a new sprint
+- `GET /api/v1/sprints` - List all sprints (with optional filters)
+- `GET /api/v1/sprints/{sprint_id}` - Get sprint details
+- `PATCH /api/v1/sprints/{sprint_id}` - Update a sprint
+- `DELETE /api/v1/sprints/{sprint_id}` - Delete a sprint
 
-Would you like help with any specific aspect?
+### Standups
+- `POST /api/v1/standups` - Submit a standup update
+- `GET /api/v1/standups` - List standups (with filters: user, sprint, blockers, date range)
+- `GET /api/v1/standups/{standup_id}` - Get standup details
+- `DELETE /api/v1/standups/{standup_id}` - Delete a standup
+
+### Retrospectives
+- `POST /api/v1/retrospectives` - Create retrospective with AI insights
+- `GET /api/v1/retrospectives` - List retrospectives (with sprint filter)
+- `GET /api/v1/retrospectives/{retro_id}` - Get retrospective details
+- `DELETE /api/v1/retrospectives/{retro_id}` - Delete a retrospective
+
+## Usage Examples
+
+### Create a Sprint
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/sprints" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sprint 1",
+    "goal": "Implement user authentication",
+    "start_date": "2025-11-15T00:00:00",
+    "end_date": "2025-11-29T00:00:00",
+    "team_capacity": 80,
+    "committed_points": 34
+  }'
+```
+
+### Submit a Standup
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/standups" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "user123",
+    "user_name": "John Doe",
+    "yesterday": "Completed user login API endpoint",
+    "today": "Working on password reset functionality",
+    "blockers": "Need database migration approval",
+    "sprint_id": 1
+  }'
+```
+
+### Create a Retrospective
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/retrospectives" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sprint_id": 1,
+    "conducted_by": "Scrum Master",
+    "went_well": {
+      "items": ["Good team collaboration", "Met sprint goals"]
+    },
+    "went_wrong": {
+      "items": ["Some tasks took longer than estimated"]
+    },
+    "improvements": {
+      "items": ["Better story breakdown", "More frequent code reviews"]
+    },
+    "action_items": {
+      "items": ["Schedule estimation workshop", "Set up automated testing"]
+    }
+  }'
+```
+
+The API will automatically generate AI insights for the retrospective!
+
+### List Sprints with Filters
+
+```bash
+# Get only active sprints
+curl "http://localhost:8000/api/v1/sprints?status_filter=active"
+
+# Get all sprints with pagination
+curl "http://localhost:8000/api/v1/sprints?skip=0&limit=10"
+```
+
+### Get Standups with Blockers
+
+```bash
+curl "http://localhost:8000/api/v1/standups?has_blockers=true"
+```
+
+## AI Agent Capabilities
+
+The Scrum Master AI agent (`src/agent/scrum_master.py`) provides:
+
+### 1. Standup Analysis
+Analyzes daily standup updates to identify:
+- Progress patterns and team focus
+- Potential risks or concerns
+- Blocker resolution strategies
+- Actionable next steps
+
+### 2. Sprint Planning Assistance
+Helps with:
+- Capacity and velocity planning
+- Story prioritization
+- Risk and dependency identification
+- Sprint goal setting
+
+### 3. Retrospective Insights
+Generates:
+- Pattern and theme identification
+- Root cause analysis
+- Improvement suggestions
+- Action item prioritization
+- Success metrics recommendations
+
+### 4. Story Estimation
+Provides:
+- Story point estimates (Fibonacci scale)
+- Complexity factor analysis
+- Clarifying questions
+- Story breakdown suggestions
+
+## Configuration
+
+All configuration is managed through environment variables in `.env`:
+
+```bash
+# FastAPI Settings
+DEBUG=false                          # Enable debug mode
+HOST=0.0.0.0                        # Server host
+PORT=8000                           # Server port
+
+# AI Configuration
+ANTHROPIC_API_KEY=sk-ant-xxx        # Your Anthropic API key (required)
+MODEL_NAME=claude-sonnet-4-5-20250929  # Claude model to use
+MAX_TOKENS=4096                     # Max response tokens
+TEMPERATURE=0.7                     # Response creativity (0-1)
+
+# Database
+DATABASE_URL=sqlite:///./scrum_master.db  # Database connection string
+
+# Feature Flags
+ENABLE_DAILY_STANDUP=true
+ENABLE_SPRINT_PLANNING=true
+ENABLE_RETROSPECTIVES=true
+
+# CORS
+CORS_ORIGINS=*                      # Allowed CORS origins
 ```
 
 ## Development
-
-### Project Structure
-
-```
-.
-├── src/
-│   ├── agent/
-│   │   ├── scrum_master.py      # Core AI agent logic with Claude
-│   │   └── __init__.py
-│   ├── slack/
-│   │   ├── bot.py               # Slack event handlers and commands
-│   │   └── __init__.py
-│   ├── storage/
-│   │   ├── database.py          # SQLite database manager
-│   │   └── __init__.py
-│   ├── config.py                # Configuration management
-│   └── __init__.py
-├── main.py                      # Application entry point
-├── requirements.txt             # Python dependencies
-├── .env.example                 # Example environment variables
-└── README.md                    # This file
-```
-
-### Key Files
-
-**src/agent/scrum_master.py** - The core AI agent that:
-- Maintains conversation context per channel
-- Provides specialized methods for standup, sprint planning, and retrospectives
-- Uses Claude with a custom system prompt for Scrum Master behavior
-
-**src/slack/bot.py** - The Slack integration that:
-- Registers event handlers for messages and mentions
-- Implements slash commands with interactive modals
-- Manages the connection between Slack and the AI agent
-
-**src/storage/database.py** - Data persistence for:
-- Standup updates and history
-- Sprint information and tracking
-- Team velocity calculations
-- User stories and backlog items
-
-### Extending the Bot
-
-**Add a new slash command:**
-
-1. Register the command in Slack App settings
-2. Add a handler in `src/slack/bot.py`:
-
-```python
-@self.app.command("/your-command")
-def handle_your_command(ack, command, client):
-    ack()
-    # Your logic here
-```
-
-**Add new AI capabilities:**
-
-Add methods to `ScrumMasterAgent` class in `src/agent/scrum_master.py`:
-
-```python
-def your_new_feature(self, data: Dict[str, Any]) -> str:
-    prompt = f"Analyze this data: {json.dumps(data)}"
-    return self.get_response(prompt)
-```
 
 ### Running Tests
 
 ```bash
 # Install test dependencies
-pip install pytest pytest-mock
+pip install pytest pytest-asyncio
 
 # Run tests
 pytest tests/
@@ -267,41 +289,149 @@ pytest tests/
 # Format code
 black src/
 
-# Check style
+# Lint code
 flake8 src/
 
 # Type checking
 mypy src/
 ```
 
+### Database Migrations
+
+The application uses SQLAlchemy and creates tables automatically on startup. For production, consider using Alembic:
+
+```bash
+# Initialize Alembic
+alembic init alembic
+
+# Create migration
+alembic revision --autogenerate -m "Initial migration"
+
+# Apply migration
+alembic upgrade head
+```
+
+## Deployment
+
+### Docker Deployment
+
+The easiest way to deploy is using Docker:
+
+```bash
+docker-compose up -d
+```
+
+### Manual Deployment
+
+1. Set up Python 3.11+ environment
+2. Install dependencies: `pip install -r requirements.txt`
+3. Configure environment variables
+4. Run with production server: `uvicorn src.main:app --host 0.0.0.0 --port 8000`
+
+### Production Considerations
+
+- Use a production database (PostgreSQL recommended)
+- Set `DEBUG=false`
+- Configure proper CORS origins
+- Use HTTPS/TLS
+- Set up monitoring and logging
+- Configure rate limiting
+- Use environment secrets management
+- Set up database backups
+
+## Extending the API
+
+### Adding a New Endpoint
+
+1. **Create a schema** in `src/schemas/`:
+```python
+from pydantic import BaseModel
+
+class MyFeatureCreate(BaseModel):
+    name: str
+    description: str
+```
+
+2. **Create a model** in `src/models/`:
+```python
+from src.models.base import Base, TimestampMixin
+from sqlalchemy.orm import Mapped, mapped_column
+
+class MyFeature(Base, TimestampMixin):
+    __tablename__ = "my_features"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+```
+
+3. **Create a router** in `src/api/routes/`:
+```python
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from src.storage.database import get_db
+
+router = APIRouter()
+
+@router.post("/")
+async def create_feature(feature: MyFeatureCreate, db: Session = Depends(get_db)):
+    # Implementation
+    pass
+```
+
+4. **Register the router** in `src/main.py`:
+```python
+from src.api.routes import my_feature
+app.include_router(my_feature.router, prefix="/api/v1/my-features", tags=["MyFeature"])
+```
+
 ## Troubleshooting
 
-**Bot doesn't respond:**
-- Check that Socket Mode is enabled in Slack App settings
-- Verify all tokens in `.env` are correct
-- Check bot has required OAuth scopes
-- Look for errors in console output
+**API doesn't start:**
+- Check that port 8000 is available
+- Verify Python version (3.11+)
+- Ensure all dependencies are installed
 
 **Database errors:**
-- The SQLite database is created automatically on first run
+- Database file is created automatically
 - Check file permissions in the working directory
-- Database location: `scrum_master.db`
+- For production, use PostgreSQL with proper connection string
 
-**API rate limits:**
-- Slack has rate limits on API calls
-- Anthropic Claude API has usage limits based on your plan
-- Consider implementing caching for frequently accessed data
+**AI responses fail:**
+- Verify `ANTHROPIC_API_KEY` is set correctly
+- Check API key has sufficient credits
+- Ensure internet connectivity for API calls
 
-## Future Enhancements
+**Docker build fails:**
+- Ensure Docker is installed and running
+- Check Dockerfile syntax
+- Verify base image is available
 
-Potential features to add:
-- Integration with Jira/Linear for automatic story tracking
-- Scheduled standup reminders
-- Burndown chart generation
-- Team mood tracking and analytics
-- Multi-language support
-- Voice/video standup transcription
+## Documentation
+
+See the `/docs` folder for additional documentation:
+- [Slack Integration Guide](docs/SLACK_SETUP.md)
+- [Jira API Integration](docs/JIRA_API.md)
+- [Trello API Integration](docs/TRELLO_API.md)
+- [CrewAI Integration](docs/CREWAI.md)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
 ## License
 
-MIT
+MIT License - see LICENSE file for details
+
+## Support
+
+For issues and questions:
+- Open an issue on GitHub
+- Check the API documentation at `/docs`
+- Review the existing documentation in `/docs` folder
+
+---
+
+**Built with FastAPI, Claude AI, and SQLAlchemy**
