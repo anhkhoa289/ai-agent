@@ -57,6 +57,41 @@ python main.py
 
 The API will start at `http://localhost:8000`
 
+### Development with PostgreSQL (Docker Compose)
+
+For local development with PostgreSQL database:
+
+1. **Start PostgreSQL database:**
+```bash
+docker-compose up -d
+```
+
+2. **Update `.env` file with PostgreSQL connection:**
+```bash
+DATABASE_URL=postgresql://scrum_user:scrum_password@localhost:5432/scrum_master
+```
+
+3. **Run the application locally:**
+```bash
+python main.py
+```
+
+4. **Stop database:**
+```bash
+docker-compose down
+```
+
+5. **Stop and remove volumes (clean database):**
+```bash
+docker-compose down -v
+```
+
+The docker-compose provides:
+- **PostgreSQL 16** database with persistent volume
+- Accessible at `localhost:5432`
+- Default credentials: `scrum_user` / `scrum_password`
+- Database name: `scrum_master`
+
 ## API Documentation
 
 Once running, access the interactive documentation:
@@ -95,6 +130,7 @@ ai-agent/
 ├── requirements.txt               # Python dependencies
 ├── Procfile                       # Process definition for buildpack
 ├── makefile                       # Build and deployment commands
+├── docker-compose.yml             # PostgreSQL for local dev
 ├── .env.example                   # Example environment variables
 └── README.md                      # This file
 ```
@@ -247,7 +283,14 @@ MAX_TOKENS=4096                     # Max response tokens
 TEMPERATURE=0.7                     # Response creativity (0-1)
 
 # Database
-DATABASE_URL=sqlite:///./scrum_master.db  # Database connection string
+# For local development with SQLite (simple, no setup required)
+# DATABASE_URL=sqlite:///./scrum_master.db
+
+# For local development with PostgreSQL (recommended, use docker-compose)
+DATABASE_URL=postgresql://scrum_user:scrum_password@localhost:5432/scrum_master
+
+# For production (use environment-specific credentials)
+# DATABASE_URL=postgresql://user:password@host:port/database
 
 # Feature Flags
 ENABLE_DAILY_STANDUP=true
