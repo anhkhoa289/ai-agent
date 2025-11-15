@@ -11,7 +11,7 @@ An intelligent Scrum Master assistant built with FastAPI and powered by Anthropi
 - **Retrospectives**: Conduct retrospectives with AI-generated insights
 - **Story Estimation**: Get AI-assisted story point estimation guidance
 - **SQLite Database**: Simple, file-based persistence
-- **Docker Support**: Ready-to-deploy containerization
+- **Buildpack Support**: Deploy with Cloud Native Buildpacks or Google Cloud Build
 - **Interactive Docs**: Auto-generated Swagger UI and ReDoc documentation
 
 ## Quick Start
@@ -57,19 +57,6 @@ python main.py
 
 The API will start at `http://localhost:8000`
 
-### Using Docker
-
-1. **Build and run with Docker Compose:**
-```bash
-docker-compose up -d
-```
-
-2. **Or build manually:**
-```bash
-docker build -t scrum-master-api .
-docker run -p 8000:8000 --env-file .env scrum-master-api
-```
-
 ## API Documentation
 
 Once running, access the interactive documentation:
@@ -106,8 +93,8 @@ ai-agent/
 │   └── main.py                    # FastAPI app factory
 ├── main.py                        # Application entry point
 ├── requirements.txt               # Python dependencies
-├── Dockerfile                     # Docker configuration
-├── docker-compose.yml             # Docker Compose setup
+├── Procfile                       # Process definition for buildpack
+├── makefile                       # Build and deployment commands
 ├── .env.example                   # Example environment variables
 └── README.md                      # This file
 ```
@@ -313,12 +300,28 @@ alembic upgrade head
 
 ## Deployment
 
-### Docker Deployment
+### Google Cloud Build
 
-The easiest way to deploy is using Docker:
+Build and deploy to Google Artifact Registry using Cloud Build:
 
 ```bash
-docker-compose up -d
+# Build and push to artifact registry
+make gcloud-build
+
+# Or with full command
+gcloud builds submit --async --tag <region>-docker.pkg.dev/<project-id>/<repository>/<image-name>:<version>
+```
+
+### Cloud Native Buildpacks
+
+Build using Paketo buildpacks locally:
+
+```bash
+# Build with buildpacks
+make pack-load
+
+# Or with full command
+pack build <image-name>:<version> --builder paketobuildpacks/builder-jammy-base
 ```
 
 ### Manual Deployment
@@ -326,7 +329,7 @@ docker-compose up -d
 1. Set up Python 3.11+ environment
 2. Install dependencies: `pip install -r requirements.txt`
 3. Configure environment variables
-4. Run with production server: `uvicorn src.main:app --host 0.0.0.0 --port 8000`
+4. Run with production server: `uvicorn src.main:app --host 0.0.0.0 --port $PORT`
 
 ### Production Considerations
 
@@ -336,8 +339,9 @@ docker-compose up -d
 - Use HTTPS/TLS
 - Set up monitoring and logging
 - Configure rate limiting
-- Use environment secrets management
+- Use environment secrets management (Google Secret Manager)
 - Set up database backups
+- Deploy to Cloud Run or Google Kubernetes Engine
 
 ## Extending the API
 
@@ -400,10 +404,11 @@ app.include_router(my_feature.router, prefix="/api/v1/my-features", tags=["MyFea
 - Check API key has sufficient credits
 - Ensure internet connectivity for API calls
 
-**Docker build fails:**
-- Ensure Docker is installed and running
-- Check Dockerfile syntax
-- Verify base image is available
+**Buildpack deployment issues:**
+- Ensure Python version is specified correctly (3.11+)
+- Check that `requirements.txt` is in the root directory
+- Verify Procfile syntax is correct
+- For Google Cloud Build, ensure proper project permissions
 
 ## Documentation
 
