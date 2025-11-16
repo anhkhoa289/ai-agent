@@ -27,3 +27,26 @@ gcloud-build:
 	gcloud builds submit \
 		--async \
 		--tag $(ARTIFACT_REGISTRY_NAME)
+
+# Development commands
+.PHONY: run ngrok dev install
+
+install:
+	pip install -r requirements.txt
+
+run:
+	python main.py
+
+ngrok:
+	@echo "Starting ngrok tunnel on port 8000..."
+	@echo "Copy the HTTPS URL and configure in Slack:"
+	@echo "  - Events: https://YOUR-URL.ngrok.io/slack/events"
+	@echo "  - Interactions: https://YOUR-URL.ngrok.io/slack/interactions"
+	@echo "  - Commands: https://YOUR-URL.ngrok.io/slack/commands"
+	@echo ""
+	ngrok http 8000
+
+dev:
+	@echo "Starting development environment..."
+	@echo "Run 'make run' in one terminal"
+	@echo "Run 'make ngrok' in another terminal"

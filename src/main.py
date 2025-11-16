@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 
 from src.config import settings
-from src.api.routes import health, sprints, standups, retrospectives, crewai
+from src.api.routes import health, sprints, standups, retrospectives, crewai, slack
 from src.storage.database import init_db
 
 
@@ -70,6 +70,11 @@ def create_app() -> FastAPI:
         crewai.router,
         prefix=f"{settings.api_prefix}/crewai",
         tags=["CrewAI Playground"]
+    )
+    app.include_router(
+        slack.router,
+        prefix="/slack",
+        tags=["Slack Integration"]
     )
 
     @app.exception_handler(Exception)
