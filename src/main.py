@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 
 from src.config import settings
-from src.api.routes import health, sprints, standups, retrospectives
+from src.api.routes import health, sprints, standups, retrospectives, slack
 from src.storage.database import init_db
 
 
@@ -65,6 +65,11 @@ def create_app() -> FastAPI:
         retrospectives.router,
         prefix=f"{settings.api_prefix}/retrospectives",
         tags=["Retrospectives"]
+    )
+    app.include_router(
+        slack.router,
+        prefix="/slack",
+        tags=["Slack Integration"]
     )
 
     @app.exception_handler(Exception)

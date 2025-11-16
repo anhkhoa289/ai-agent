@@ -51,6 +51,31 @@ python main.py
 
 The API will start at `http://localhost:8000`
 
+### Slack Integration (Optional)
+
+To integrate with Slack:
+
+**Option 1: Socket Mode (Recommended for Development)**
+- No public URL required
+- See [Slack Setup Guide](docs/SLACK_SETUP.md)
+
+**Option 2: Webhooks with ngrok (HTTP Mode)**
+- Use ngrok for local development with webhooks
+- See [Ngrok + Webhook Setup Guide](docs/NGROK_WEBHOOK_SETUP.md)
+
+Quick start with ngrok:
+```bash
+# Start FastAPI and ngrok together
+./scripts/start-dev.sh
+
+# Or start them separately
+# Terminal 1:
+python main.py
+
+# Terminal 2:
+./scripts/start-ngrok.sh
+```
+
 ### Development with PostgreSQL (Docker Compose)
 
 For local development with PostgreSQL database:
@@ -450,7 +475,8 @@ app.include_router(my_feature.router, prefix="/api/v1/my-features", tags=["MyFea
 ## Documentation
 
 See the `/docs` folder for additional documentation:
-- [Slack Integration Guide](docs/SLACK_SETUP.md)
+- [Slack Integration Guide](docs/SLACK_SETUP.md) - Complete Slack app setup with Socket Mode
+- [Ngrok + Webhook Setup](docs/NGROK_WEBHOOK_SETUP.md) - Setup ngrok tunnels for webhook development
 - [Jira API Integration](docs/JIRA_API.md)
 - [Trello API Integration](docs/TRELLO_API.md)
 - [CrewAI Integration](docs/CREWAI.md)
