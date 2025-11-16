@@ -1,0 +1,19 @@
+@base_url = http://localhost:8000/api/v1
+
+GET {{base_url}}/crewai/agents
+Accept: application/json
+
+###
+POST {{base_url}}/crewai/sprint-planning
+Accept: application/json
+Content-Type: application/json
+
+{
+  "context": "We are planning Sprint 5 for our AI development team. Team capacity: 80 story points. Current backlog items: 1) User authentication module (13 points), 2) Dashboard analytics (8 points), 3) API rate limiting (5 points), 4) Database optimization (13 points), 5) Bug fixes from Sprint 4 (8 points), 6) Unit test coverage improvement (5 points), 7) Documentation updates (3 points). Team velocity from last 3 sprints: 75, 82, 78 points. Known impediments: Need to upgrade database server next week.",
+  "additional_info": {
+    "sprint_number": 5,
+    "team_capacity": 80,
+    "team_velocity_avg": 78,
+    "sprint_duration_weeks": 2
+  }
+}
