@@ -29,8 +29,22 @@ class Settings(BaseSettings):
     slack_app_token: Optional[str] = None
     slack_signing_secret: Optional[str] = None
 
-    # AI Configuration
-    anthropic_api_key: str
+    # AI Configuration - LLM Provider Settings
+    # Supported providers: anthropic, openai, gemini, groq, ollama
+    llm_provider: str = "anthropic"  # Choose: anthropic, openai, gemini, groq, ollama
+
+    # API Keys for different providers (only the one matching llm_provider is required)
+    anthropic_api_key: Optional[str] = None
+    openai_api_key: Optional[str] = None
+    google_api_key: Optional[str] = None  # For Gemini
+    groq_api_key: Optional[str] = None
+
+    # Model configuration
+    # Anthropic: claude-sonnet-4-5-20250929, claude-3-5-sonnet-20241022, claude-3-opus-20240229
+    # OpenAI: gpt-4o, gpt-4o-mini, gpt-4-turbo
+    # Gemini: gemini-1.5-pro, gemini-1.5-flash, gemini-2.0-flash-exp
+    # Groq: llama-3.1-70b-versatile, mixtral-8x7b-32768
+    # Ollama: llama2, mistral, codellama (for local models)
     model_name: str = "claude-sonnet-4-5-20250929"
     max_tokens: int = 4096
     temperature: float = 0.7

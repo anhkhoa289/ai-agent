@@ -13,12 +13,50 @@ def create_scrum_master_agents() -> Dict[str, Agent]:
     Returns:
         Dictionary of agent names to Agent objects
     """
-    # Configure the LLM to use Anthropic Claude
-    llm = LLM(
-        model=f"anthropic/{settings.model_name}",
-        api_key=settings.anthropic_api_key,
-        temperature=settings.temperature
-    )
+    # Configure the LLM based on selected provider
+    provider = settings.llm_provider.lower()
+
+    # Get the appropriate API key based on provider
+    api_key_map = {
+        "anthropic": settings.anthropic_api_key,
+        "openai": settings.openai_api_key,
+        "gemini": settings.google_api_key,
+        "groq": settings.groq_api_key,
+        "ollama": None  # Ollama runs locally, no API key needed
+    }
+
+    api_key = api_key_map.get(provider)
+
+    # Validate API key for non-local providers
+    if provider != "ollama" and not api_key:
+        raise ValueError(
+            f"API key for {provider} is not set. "
+            f"Please set {provider.upper()}_API_KEY in your .env file"
+        )
+
+    # Format model name with provider prefix if needed
+    # Some providers like OpenAI don't need prefix, others like Anthropic and Gemini do
+    model_name = settings.model_name
+    if provider == "anthropic" and not model_name.startswith("anthropic/"):
+        model_name = f"anthropic/{model_name}"
+    elif provider == "gemini" and not model_name.startswith("gemini/"):
+        model_name = f"gemini/{model_name}"
+    elif provider == "groq" and not model_name.startswith("groq/"):
+        model_name = f"groq/{model_name}"
+    elif provider == "ollama" and not model_name.startswith("ollama/"):
+        model_name = f"ollama/{model_name}"
+
+    # Create LLM configuration
+    llm_config = {
+        "model": model_name,
+        "temperature": settings.temperature
+    }
+
+    # Add API key if provider needs one
+    if api_key:
+        llm_config["api_key"] = api_key
+
+    llm = LLM(**llm_config)
 
     # Product Owner Agent - Focuses on backlog management and prioritization
     product_owner = Agent(
