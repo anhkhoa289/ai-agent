@@ -1,7 +1,9 @@
 """CrewAI agents and crew configuration for scrum master tasks."""
 
 from crewai import Agent, Crew, Task, Process
+from crewai.llm import LLM
 from typing import List, Dict, Any
+from src.config import settings
 
 
 def create_scrum_master_agents() -> Dict[str, Agent]:
@@ -11,6 +13,12 @@ def create_scrum_master_agents() -> Dict[str, Agent]:
     Returns:
         Dictionary of agent names to Agent objects
     """
+    # Configure the LLM to use Anthropic Claude
+    llm = LLM(
+        model=f"anthropic/{settings.model_name}",
+        api_key=settings.anthropic_api_key,
+        temperature=settings.temperature
+    )
 
     # Product Owner Agent - Focuses on backlog management and prioritization
     product_owner = Agent(
@@ -20,7 +28,8 @@ def create_scrum_master_agents() -> Dict[str, Agent]:
         of agile methodologies. You excel at understanding user needs, creating
         user stories, and prioritizing features based on business value.""",
         verbose=True,
-        allow_delegation=False
+        allow_delegation=False,
+        llm=llm
     )
 
     # Scrum Master Agent - Facilitates scrum ceremonies and removes impediments
@@ -31,7 +40,8 @@ def create_scrum_master_agents() -> Dict[str, Agent]:
         in facilitating agile teams. You are great at identifying and removing
         impediments, coaching teams, and ensuring scrum practices are followed.""",
         verbose=True,
-        allow_delegation=True
+        allow_delegation=True,
+        llm=llm
     )
 
     # Developer Agent - Provides technical insights and estimations
@@ -42,7 +52,8 @@ def create_scrum_master_agents() -> Dict[str, Agent]:
         in various technologies. You excel at breaking down complex features into
         technical tasks and providing accurate time estimations.""",
         verbose=True,
-        allow_delegation=False
+        allow_delegation=False,
+        llm=llm
     )
 
     # QA Agent - Focuses on quality assurance and testing
@@ -53,7 +64,8 @@ def create_scrum_master_agents() -> Dict[str, Agent]:
         first. You excel at creating test plans, identifying edge cases, and
         ensuring comprehensive test coverage.""",
         verbose=True,
-        allow_delegation=False
+        allow_delegation=False,
+        llm=llm
     )
 
     return {
