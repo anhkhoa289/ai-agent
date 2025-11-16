@@ -122,24 +122,14 @@ PORT=8000
 
 ### 4. Start the development environment
 
-**Option A: Automated (Recommended)**
-```bash
-./scripts/start-dev.sh
-```
-This script starts both FastAPI and ngrok automatically.
-
-**Option B: Manual**
-
 Terminal 1 - Start FastAPI:
 ```bash
-python main.py
+make run
 ```
 
 Terminal 2 - Start ngrok:
 ```bash
-./scripts/start-ngrok.sh
-# Or manually:
-ngrok http 8000
+make ngrok
 ```
 
 ### 5. Configure Slack webhooks
@@ -267,12 +257,7 @@ You should see the Slack endpoints:
 #### 3.1 Start ngrok
 
 ```bash
-ngrok http 8000
-```
-
-Or use the provided script:
-```bash
-./scripts/start-ngrok.sh
+make ngrok
 ```
 
 #### 3.2 Understand ngrok output
@@ -667,7 +652,11 @@ Ngrok paid plans offer:
 
 1. **Start environment:**
    ```bash
-   ./scripts/start-dev.sh
+   # Terminal 1
+   make run
+
+   # Terminal 2
+   make ngrok
    ```
 
 2. **Make changes** to code
@@ -750,24 +739,20 @@ Ngrok paid plans offer:
 ### Useful Commands
 
 ```bash
+# Install dependencies
+make install
+
 # Start FastAPI
-python main.py
+make run
 
 # Start ngrok
-ngrok http 8000
-./scripts/start-ngrok.sh
-
-# Start both
-./scripts/start-dev.sh
+make ngrok
 
 # View ngrok inspector
 open http://127.0.0.1:4040
 
 # Test health endpoint
 curl http://localhost:8000/health
-
-# Check logs
-tail -f logs/app.log  # if you set up file logging
 ```
 
 ---
