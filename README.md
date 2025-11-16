@@ -1,11 +1,12 @@
 # Scrum Master AI Agent - FastAPI
 
-An intelligent Scrum Master assistant built with FastAPI and powered by Anthropic Claude AI. This RESTful API helps agile teams manage sprints, facilitate standups, conduct retrospectives, and improve team productivity.
+An intelligent Scrum Master assistant built with FastAPI and powered by multiple AI providers (Anthropic Claude, OpenAI GPT, Google Gemini, Groq, Ollama). This RESTful API helps agile teams manage sprints, facilitate standups, conduct retrospectives, and improve team productivity.
 
 ## Features
 
 - **RESTful API**: Clean, modern FastAPI-based REST API
-- **AI-Powered Insights**: Leverage Claude AI for intelligent scrum assistance
+- **Multi-Provider AI Support**: Choose from Anthropic Claude, OpenAI GPT, Google Gemini, Groq, or local Ollama
+- **AI-Powered Insights**: Leverage cutting-edge LLMs for intelligent scrum assistance
 - **Sprint Management**: Create and track sprints with goals and velocity metrics
 - **Daily Standups**: Record and analyze standup updates with blocker detection
 - **Retrospectives**: Conduct retrospectives with AI-generated insights
@@ -19,7 +20,12 @@ An intelligent Scrum Master assistant built with FastAPI and powered by Anthropi
 ### Prerequisites
 
 - Python 3.11+
-- Anthropic API key ([Get one here](https://console.anthropic.com/))
+- API key for your chosen AI provider:
+  - **Anthropic** (default): [Get API key](https://console.anthropic.com/)
+  - **OpenAI**: [Get API key](https://platform.openai.com/api-keys)
+  - **Google Gemini**: [Get API key](https://makersuite.google.com/app/apikey)
+  - **Groq**: [Get API key](https://console.groq.com/)
+  - **Ollama**: [Install locally](https://ollama.ai/) (no API key needed)
 
 ### Installation
 
@@ -39,10 +45,44 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edit `.env` and add your Anthropic API key:
+Edit `.env` and configure your AI provider:
+
+**Option 1: Anthropic Claude (default)**
 ```bash
-ANTHROPIC_API_KEY=your_api_key_here
+LLM_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+MODEL_NAME=claude-sonnet-4-5-20250929
 ```
+
+**Option 2: OpenAI GPT**
+```bash
+LLM_PROVIDER=openai
+OPENAI_API_KEY=sk-your-key-here
+MODEL_NAME=gpt-4o
+```
+
+**Option 3: Google Gemini**
+```bash
+LLM_PROVIDER=gemini
+GOOGLE_API_KEY=your-key-here
+MODEL_NAME=gemini-1.5-pro
+```
+
+**Option 4: Groq (fast inference)**
+```bash
+LLM_PROVIDER=groq
+GROQ_API_KEY=your-key-here
+MODEL_NAME=llama-3.1-70b-versatile
+```
+
+**Option 5: Ollama (local, free)**
+```bash
+LLM_PROVIDER=ollama
+MODEL_NAME=llama2
+# No API key needed - make sure Ollama is running: ollama serve
+```
+
+📖 **See [docs/LLM_PROVIDERS.md](docs/LLM_PROVIDERS.md) for detailed configuration guide**
 
 5. **Run the application:**
 ```bash
