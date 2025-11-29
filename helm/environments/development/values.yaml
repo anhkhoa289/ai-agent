@@ -1,0 +1,49 @@
+# Development environment values
+replicaCount: 1
+
+image:
+  repository: scrum-master-ai
+  tag: "latest"
+  pullPolicy: Always
+
+app:
+  debug: true
+
+  anthropic:
+    modelName: "claude-sonnet-4-5-20250929"
+    maxTokens: 4096
+    temperature: 0.7
+
+  slack:
+    enabled: false
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+postgresql:
+  enabled: true
+  auth:
+    username: rum
+    password: Rum1234
+    database: rum
+  primary:
+    persistence:
+      enabled: true
+      size: 5Gi
+
+ingress:
+  enabled: false
+  className: "nginx"
+  hosts:
+    - host: scrum-master-ai-dev.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+autoscaling:
+  enabled: false

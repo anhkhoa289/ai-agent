@@ -1,0 +1,61 @@
+# Staging environment values
+replicaCount: 2
+
+image:
+  repository: scrum-master-ai
+  tag: "staging"
+  pullPolicy: IfNotPresent
+
+app:
+  debug: false
+
+  anthropic:
+    modelName: "claude-sonnet-4-5-20250929"
+    maxTokens: 4096
+    temperature: 0.7
+
+  slack:
+    enabled: true
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+postgresql:
+  enabled: true
+  auth:
+    username: rum
+    database: rum
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  hosts:
+    - host: scrum-master-ai-staging.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: scrum-master-ai-staging-tls
+      hosts:
+        - scrum-master-ai-staging.example.com
+
+autoscaling:
+  enabled: false

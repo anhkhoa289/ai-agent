@@ -1,0 +1,47 @@
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: scrum-master-ai
+    namespace: {{ .Environment.Values.namespace | default "default" }}
+    chart: ./helm/scrum-master-ai
+    version: 0.1.0
+    installed: true
+    wait: true
+    timeout: 600
+    values:
+      - ./helm/scrum-master-ai/values.yaml
+      - ./helm/environments/{{ .Environment.Name }}/values.yaml
+    secrets:
+      - ./helm/environments/{{ .Environment.Name }}/secrets.yaml
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "sh"
+        args:
+          - "-c"
+          - |
+            echo "Deploying Scrum Master AI Agent to {{ .Environment.Name }} environment"
+            echo "Namespace: {{ .Environment.Values.namespace }}"
+      - events: ["postsync"]
+        showlogs: true
+        command: "sh"
+        args:
+          - "-c"
+          - |
+            echo "Deployment completed successfully"
+            echo "Run: kubectl get pods -n {{ .Environment.Values.namespace }}"
+
+environments:
+  development:
+    values:
+      - namespace: scrum-master-ai-dev
+
+  staging:
+    values:
+      - namespace: scrum-master-ai-staging
+
+  production:
+    values:
+      - namespace: scrum-master-ai-prod

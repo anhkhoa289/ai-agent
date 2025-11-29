@@ -1,0 +1,18 @@
+apiVersion: v2
+name: scrum-master-ai
+description: A Helm chart for Scrum Master AI Agent - An intelligent assistant powered by AI
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - scrum
+  - ai
+  - agile
+  - fastapi
+maintainers:
+  - name: anhkhoa289
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
